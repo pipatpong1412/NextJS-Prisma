@@ -1,9 +1,5 @@
 import prisma from "@/configs/prisma";
 
-// interface ParamsProps {
-//     params: 
-// }
-
 export async function GET(req: Request, { params }: { params: { id: string } }) {
     const postId = Number(params.id)
     const post = await prisma.post.findUnique({
