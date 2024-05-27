@@ -13,14 +13,9 @@ const Edit = ({ params }: { params: { id: string } }) => {
     const [post, setPost] = useState<Post>({
         title: '',
         content: '',
-        category: ''
+        categoryId: ''
     })
-
-    const [editPost, setEditPost] = useState<Post>({
-        title: '',
-        content: '',
-        category: ''
-    })
+    const [categories, setCategories] = useState([])
 
     const fetchPost = async (id: Number) => {
         try {
@@ -31,22 +26,34 @@ const Edit = ({ params }: { params: { id: string } }) => {
         }
     }
 
+    const fetchCates = async () => {
+        try {
+            const res = await axios.get(`/api/categories`)
+            setCategories(res.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     useEffect(() => {
         if (id) {
             fetchPost(parseInt(id))
+            fetchCates()
         }
     }, [id])
 
+    // console.log(post)
+
     const hdlChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { value, name } = e.target
-        setEditPost(prv => ({ ...prv, [name]: value }))
+        setPost(prv => ({ ...prv, [name]: value }))
     }
 
     const hdlSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         try {
-            await axios.put(`/api/posts/${id}`, editPost)
+            await axios.put(`/api/posts/${id}`, post)
             router.push('/')
 
         } catch (error) {
@@ -70,9 +77,8 @@ const Edit = ({ params }: { params: { id: string } }) => {
                         name="title"
                         id="title"
                         required
-                        value={editPost.title}
+                        value={post.title}
                         onChange={hdlChange}
-                        placeholder={post.title}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     />
                 </div>
@@ -88,9 +94,8 @@ const Edit = ({ params }: { params: { id: string } }) => {
                         id="content"
                         required
                         rows={4}
-                        value={editPost.content}
+                        value={post.content}
                         onChange={hdlChange}
-                        placeholder={post.content}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     ></textarea>
                 </div>
@@ -98,14 +103,14 @@ const Edit = ({ params }: { params: { id: string } }) => {
                     <div>
                         <label>Category</label>
                         <select
-                            name='category'
-                            value={post.category}
+                            name='categoryId'
+                            value={post.categoryId}
                             onChange={hdlChange}
                         >
                             <option value="">Select a category</option>
-                            {/* Example static categories, replace or populate dynamically */}
-                            <option value="Tech">Tech</option>
-                            <option value="Lifestyle">Lifestyle</option>
+                            {categories.map((cat: any) => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            ))}
                         </select>
                     </div>
                     <button

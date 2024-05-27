@@ -10,7 +10,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 }
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-    const { title, content, category } = await req.json()
+    const { title, content, categoryId } = await req.json()
     const postId = Number(params.id)
 
     await prisma.post.update({
@@ -20,7 +20,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
         data: {
             title,
             content,
-            category
+            categoryId: Number(categoryId)
         }
     })
     return Response.json({ message: 'Post Updated' })

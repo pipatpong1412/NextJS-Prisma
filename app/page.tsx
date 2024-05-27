@@ -8,19 +8,25 @@ import { Post } from '@/interfaces/post.interface'
 
 const List = () => {
   const [posts, setPosts] = useState<Post[]>([])
+  const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
   const [sort, setSort] = useState('desc')
-
-  useEffect(() => {
-    fetchPosts()
-  }, [])
 
   const fetchPosts = async () => {
     try {
       const query = new URLSearchParams({ category, search, sort }).toString()
       const res = await axios.get(`/api/posts?${query}`)
       setPosts(res.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchCates = async () => {
+    try {
+      const res = await axios.get(`/api/categories`)
+      setCategories(res.data)
     } catch (error) {
       console.error(error)
     }
@@ -34,6 +40,11 @@ const List = () => {
       console.error('Failed to delete the post', error)
     }
   }
+
+  useEffect(() => {
+    fetchPosts()
+    fetchCates()
+  }, [])
 
   const hdlApplyFilter = () => {
     fetchPosts()
@@ -58,8 +69,9 @@ const List = () => {
               className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">Select Category</option>
-              <option value="Tech">Tech</option>
-              <option value="Lifestyle">Lifestyle</option>
+              {categories.map((cat: any) => (
+                <option key={cat.id} value={cat.name}>{cat.name}</option>
+              ))}
             </select>
             <select
               value={sort}
@@ -110,7 +122,7 @@ const List = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    {post.category}
+                    {post.category.name}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

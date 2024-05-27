@@ -2,15 +2,31 @@
 import { Post } from '@/interfaces/post.interface'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 
 const Create = () => {
+
 
     const [post, setPost] = useState<Post>({
         title: '',
         content: '',
-        category: ''
+        categoryId: ''
     })
+    const [categories, setCategories] = useState([])
+
+
+    const fetchCates = async () => {
+        try {
+            const res = await axios.get(`/api/categories`)
+            setCategories(res.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchCates()
+    }, [])
 
     const router = useRouter()
 
@@ -72,14 +88,14 @@ const Create = () => {
                 <div>
                     <label>Category</label>
                     <select
-                        name='category'
-                        value={post.category}
+                        name='categoryId'
+                        value={post.categoryId}
                         onChange={hdlChange}
                     >
                         <option value="">Select a category</option>
-                        {/* Example static categories, replace or populate dynamically */}
-                        <option value="Tech">Tech</option>
-                        <option value="Lifestyle">Lifestyle</option>
+                        {categories.map((cat: any) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
                     </select>
                 </div>
                 <div>
